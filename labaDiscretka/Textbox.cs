@@ -177,7 +177,7 @@
         public void SetRadius(float radius)
         {
             circle.Radius = radius;
-            circle.Origin = new Vector2f(radius/2,radius/2);
+            circle.Origin = new Vector2f(radius,radius);
         }
         public void SetCharacterSize(uint size)
         {
