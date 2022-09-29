@@ -38,7 +38,8 @@ while(MainWindow.IsOpen)
         MainWindow.Draw(sprite);
     foreach (CircleTextbox circle in circles)
         MainWindow.Draw(circle);
-    MainWindow.Draw(catching);
+    if(catching is not null)
+        MainWindow.Draw(catching);
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
