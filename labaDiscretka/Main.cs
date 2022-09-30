@@ -65,7 +65,7 @@ while(MainWindow.IsOpen)
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
-{   if(isSpisokDraw)
+{   if(isSpisokDraw && e.Button == Mouse.Button.Left)
     {
 
         isSpisokDraw = false;
@@ -102,7 +102,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
         }
     }
     if(e.Button == Mouse.Button.Right && catching is null)
-   {
+    {
         foreach(CircleTextbox circle in circles)
         {
             if(circle.Contains(e.X, e.Y))
@@ -113,7 +113,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                 return;
             }
         }
-   }
+    }
     if(e.Button == Mouse.Button.Right && catching is null)
     {
         textboxes[0].set_pos(e.X + 40, e.Y + 10);
