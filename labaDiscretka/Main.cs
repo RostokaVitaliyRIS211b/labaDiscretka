@@ -13,6 +13,8 @@ CircleTextbox? catching = null;
 
 Textbox universum = new();
 
+Textbox active = new();
+
 bool isSpisokDraw = false;
 
 buttons.Add(new Sprite
