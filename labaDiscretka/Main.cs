@@ -65,15 +65,56 @@ while(MainWindow.IsOpen)
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
-{   if(isSpisokDraw && e.Button == Mouse.Button.Left)
+{   
+    if(isSpisokDraw && e.Button == Mouse.Button.Left)
     {
+        int n = 0;
+        bool cliked = false;
+
+        foreach(Textbox textbox in textboxes)
+        {
+            ++n;
+            if(textbox.contains(e.X,e.Y))
+            {
+                cliked = true;
+                break;
+            }
+        }
+
+        int index = mutable is not null?circles.IndexOf(mutable):-1;
+        Set set = index!=-1 ? sets[index] : new();
+
+        if(cliked)
+        {
+            switch (n)
+            {
+                case 1:
+                    AddElem(set, mutable is null);
+                    break;
+                case 2:
+                    RemoveElem(set, mutable is null);
+                    break;
+                case 3:
+                    RemoveAll(set, mutable is null);
+                    break;
+                case 4:
+                    SetBounds(set, mutable is null);
+                    break;
+                case 5:
+                    Rename(set, mutable is null);
+                    break;
+            }
+        }
 
         isSpisokDraw = false;
         mutable = null;
+
         return;
     }
+
     isSpisokDraw = false;
     mutable = null;
+
     if(e.Button == Mouse.Button.Left && buttons[0].GetGlobalBounds().Contains(e.X,e.Y) && catching is null)
     {
         Set set = new();
@@ -90,6 +131,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
         circles.Add(circle);
         return;
     }
+
     if(e.Button == Mouse.Button.Left && catching is null)
     {
         foreach (CircleTextbox circle in circles)
@@ -101,6 +143,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
             }
         }
     }
+
     if(e.Button == Mouse.Button.Right && catching is null)
     {
         foreach(CircleTextbox circle in circles)
@@ -114,6 +157,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
             }
         }
     }
+
     if(e.Button == Mouse.Button.Right && catching is null)
     {
         textboxes[0].set_pos(e.X + 40, e.Y + 10);
@@ -125,6 +169,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
 void MouseMoved(object? sender, MouseMoveEventArgs? e)
 {
     catching?.SetPosition(e.X,e.Y);
+
     if(catching is null && isSpisokDraw)
     {
         foreach(Textbox textbox in textboxes)
@@ -163,23 +208,19 @@ void InitTextboxes()
     textboxes.Add(textbox);
     textbox = new();
     textbox.Copy(textboxes[0]);
-    textbox.set_string("Remove elem");
+    textbox.set_string("Remove All");
     textbox.set_pos(40, 50);
     textboxes.Add(textbox);
     textbox = new();
     textbox.Copy(textboxes[0]);
-    textbox.set_string("Remove All");
+    textbox.set_string("Set Bounds");
     textbox.set_pos(40, 70);
     textboxes.Add(textbox);
     textbox = new();
     textbox.Copy(textboxes[0]);
-    textbox.set_string("Set Bounds");
+    textbox.set_string("Rename");
     textbox.set_pos(40, 90);
     textboxes.Add(textbox);
-    textbox = new();
-    textbox.Copy(textboxes[0]);
-    textbox.set_string("Rename");
-    textbox.set_pos(40, 110);
 }
 void AddElem(Set set,bool un = false)
 {
@@ -194,17 +235,45 @@ void AddElem(Set set,bool un = false)
 }
 void RemoveElem(Set set, bool un = false)
 {
+    if (!un)
+    {
 
+    }
+    else
+    {
+
+    }
 }
 void RemoveAll(Set set, bool un = false)
 {
+    if (!un)
+    {
 
-}
-void Rename(CircleTextbox textbox, Set set, bool un = false)
-{
+    }
+    else
+    {
 
+    }
 }
 void SetBounds(Set set, bool un = false)
 {
+    if (!un)
+    {
 
+    }
+    else
+    {
+
+    }
+}
+void Rename( Set set, bool un = false)
+{
+    if (!un)
+    {
+
+    }
+    else
+    {
+
+    }
 }
