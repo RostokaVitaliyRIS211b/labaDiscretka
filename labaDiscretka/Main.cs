@@ -1,5 +1,10 @@
 ﻿using Sets;
+using System.Text;
 using Textboxes;
+
+StringBuilder text = new();
+
+int code = -1;
 
 List<CircleTextbox> circles = new();
 List<Set> sets = new();
@@ -14,8 +19,20 @@ CircleTextbox? catching = null;
 Textbox universum = new();
 
 Textbox active = new();
+active.set_color_text(Color.Black);
+active.set_Fill_color_rect(Color.White);
+active.set_outline_color_rect(Color.Black);
+active.set_outline_thickness_rect(1);
+active.set_size_rect(150, 50);
+active.set_size_character_text(16);
+active.set_pos(565, 335);
+
+Textbox active2 = new(in active);
+active2.set_pos(565, 285);
 
 bool isSpisokDraw = false;
+
+bool isActiveDraw = false;  
 
 buttons.Add(new Sprite
 {
@@ -25,9 +42,10 @@ buttons.Add(new Sprite
 
 RenderWindow MainWindow = new(new VideoMode(1280, 720), "Lab1");
 
-MainWindow.MouseButtonPressed+=MouseButtonPressed;
-MainWindow.MouseMoved+=MouseMoved;
-MainWindow.MouseButtonReleased+=MouseButtonReleased;
+MainWindow.MouseButtonPressed += MouseButtonPressed;
+MainWindow.MouseMoved += MouseMoved;
+MainWindow.MouseButtonReleased += MouseButtonReleased;
+MainWindow.KeyPressed += KeyPressed;
 
 universum.set_size_character_text(32);
 universum.set_string("Universum");
@@ -83,37 +101,70 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
             }
         }
 
-        int index = mutable is not null?circles.IndexOf(mutable):-1;
+        int index = mutable is not null ? circles.IndexOf(mutable) : -1;
         Set set = index!=-1 ? sets[index] : new();
+
+        text.Clear();
+        active.set_string(text.ToString());
+        isActiveDraw = true;
+        code = n;
 
         if(cliked)
         {
             switch (n)
             {
                 case 1:
-                    AddElem(set, mutable is null);
+                    if (mutable is not null)
+                    {
+                        active2.set_string("Введите целое число для добавления в множество " + set.Name);
+                    }
+                    else
+                    {
+                        active2.set_string("Введите целое число для добавления в множество " + Universum.name);
+                    }
                     break;
                 case 2:
-                    RemoveElem(set, mutable is null);
+                    if (mutable is not null)
+                    {
+                        active2.set_string("Введите целое число для удаления из в множества " + set.Name);
+                    }
+                    else
+                    {
+                        active2.set_string("Введите целое число для удаления из в множества " + Universum.name);
+                    }
                     break;
                 case 3:
-                    RemoveAll(set, mutable is null);
+                    
                     break;
                 case 4:
-                    SetBounds(set, mutable is null);
+                    if (mutable is not null)
+                    {
+                        active2.set_string("Введите два целых числа для задания множества " + set.Name);
+                    }
+                    else
+                    {
+                        active2.set_string("Введите два целых числа для задания множества " + Universum.name);
+                    }
                     break;
                 case 5:
-                    Rename(set, mutable is null);
+                    if (mutable is not null)
+                    {
+                        active2.set_string("Введите имя множества " + set.Name);
+                    }
+                    else
+                    {
+                        active2.set_string("Введите имя множества " + Universum.name);
+                    }
                     break;
             }
         }
 
         isSpisokDraw = false;
-        mutable = null;
 
         return;
     }
 
+    isActiveDraw = false;
     isSpisokDraw = false;
     mutable = null;
 
@@ -191,6 +242,42 @@ void MouseButtonReleased(object? sender, MouseButtonEventArgs? e)
 {
     catching = null;
 }
+void KeyPressed(object? sender, KeyEventArgs? e)
+{
+    if(e.Code==Keyboard.Key.Escape)
+    {
+        MainWindow.Close();
+    }
+    else if(e.Code == Keyboard.Key.Enter && isActiveDraw)
+    {
+        int index = mutable is not null ? circles.IndexOf(mutable) : -1;
+        Set set = index!=-1 ? sets[index] : new();
+        int item;
+        Int32.TryParse(active.get_string(), out item);
+
+
+        switch (code)
+        {
+            case 1:
+                AddElem(set, item,mutable is null);
+                break;
+            case 2:
+                RemoveElem(set, item, mutable is null);
+                break;
+            case 3:
+                RemoveAll(set, mutable is null);
+                break;
+            case 4:
+                SetBounds(item1,item2,set,mutable is null);
+                break;
+            case 5:
+                Rename(set, mutable is null);
+                break;
+            default: 
+                break;
+        }
+    }
+}
 void InitTextboxes()
 {
     Textbox textbox = new Textbox();
@@ -224,58 +311,42 @@ void InitTextboxes()
     textbox.set_pos(40, 90);
     textboxes.Add(textbox);
 }
-void AddElem(Set set,bool un = false)
+void AddElem(Set set,int item,bool un = false)
 {
-    if(!un)
-    {
-
-    }
-    else
-    {
-
-    }
+   
 }
-void RemoveElem(Set set, bool un = false)
+void RemoveElem(Set set,int item ,bool un = false)
 {
-    if (!un)
-    {
-
-    }
-    else
-    {
-
-    }
+    
 }
 void RemoveAll(Set set, bool un = false)
 {
-    if (!un)
-    {
-
-    }
-    else
-    {
-
-    }
+    
 }
-void SetBounds(Set set, bool un = false)
+void SetBounds(int item1, int item2,Set set, bool un = false)
 {
-    if (!un)
-    {
-
-    }
-    else
-    {
-
-    }
+    
 }
 void Rename( Set set, bool un = false)
 {
-    if (!un)
-    {
+    
+}
+string IsItException(string s1,int code)
+{
+    string s = "NO";
+    int item, item1, item2;
 
-    }
-    else
-    {
+    if ((!Int32.TryParse(active.get_string(), out item) || !Universum.elements.Contains(item)) && code == 1)
+        code = -1;
 
-    }
+    string[] its = active.get_string().Split(' ');
+    string it1 = its[0];
+    string? it2 = its.Length>1 ? its[1] : null;
+
+    bool fl1 = !Int32.TryParse(it1, out item1);
+    bool fl2 = !Int32.TryParse(it2, out item2);
+
+    if ((fl1 || fl2 || item1>=item2) && code == 4)
+        code=-1;
+    return s;
 }
