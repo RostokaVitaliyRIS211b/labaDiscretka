@@ -26,10 +26,8 @@ active.set_outline_thickness_rect(1);
 active.set_size_rect(150, 50);
 active.set_size_character_text(16);
 active.set_pos(565, 335);
-
 Textbox active2 = new(in active);
 active2.set_pos(565, 285);
-
 bool isSpisokDraw = false;
 
 bool isActiveDraw = false;  
@@ -81,7 +79,11 @@ while(MainWindow.IsOpen)
             MainWindow.Draw(textboxes[i]);
        }
     }
-    
+    if(isActiveDraw)
+    {
+        MainWindow.Draw(active);
+        MainWindow.Draw(active2);
+    }
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
@@ -134,7 +136,8 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                     }
                     break;
                 case 3:
-                    
+                    RemoveAll(set, mutable is null);
+                    isActiveDraw = false;
                     break;
                 case 4:
                     if (mutable is not null)
@@ -247,35 +250,45 @@ void KeyPressed(object? sender, KeyEventArgs? e)
     if(e.Code==Keyboard.Key.Escape)
     {
         MainWindow.Close();
+        return;
     }
-    else if(e.Code == Keyboard.Key.Enter && isActiveDraw)
+    if(e.Code!=Keyboard.Key.Enter && isActiveDraw)
+    {
+        active.set_string(active.get_string()+e.Code);
+    }
+    if(e.Code == Keyboard.Key.Enter && isActiveDraw)
     {
         int index = mutable is not null ? circles.IndexOf(mutable) : -1;
         Set set = index!=-1 ? sets[index] : new();
-        int item;
-        Int32.TryParse(active.get_string(), out item);
+        string message = IsItException(active.get_string(), code);
 
+        if (message!="NO")
+            code=-1;
 
         switch (code)
         {
             case 1:
-                AddElem(set, item,mutable is null);
+                AddElem(set, active.get_string(),mutable is null);
                 break;
+
             case 2:
-                RemoveElem(set, item, mutable is null);
+                RemoveElem(set, active.get_string(), mutable is null);
                 break;
-            case 3:
-                RemoveAll(set, mutable is null);
-                break;
+
             case 4:
-                SetBounds(item1,item2,set,mutable is null);
+                SetBounds(set, active.get_string(), mutable is null);
                 break;
+
             case 5:
                 Rename(set, mutable is null);
                 break;
-            default: 
-                break;
+
+            default:
+                throw new Exception(message);
+
+
         }
+        isActiveDraw = false;
     }
 }
 void InitTextboxes()
@@ -311,11 +324,11 @@ void InitTextboxes()
     textbox.set_pos(40, 90);
     textboxes.Add(textbox);
 }
-void AddElem(Set set,int item,bool un = false)
+void AddElem(Set set,string item,bool un = false)
 {
    
 }
-void RemoveElem(Set set,int item ,bool un = false)
+void RemoveElem(Set set, string item, bool un = false)
 {
     
 }
@@ -323,7 +336,7 @@ void RemoveAll(Set set, bool un = false)
 {
     
 }
-void SetBounds(int item1, int item2,Set set, bool un = false)
+void SetBounds(Set set, string item, bool un = false)
 {
     
 }
@@ -335,18 +348,64 @@ string IsItException(string s1,int code)
 {
     string s = "NO";
     int item, item1, item2;
-
-    if ((!Int32.TryParse(active.get_string(), out item) || !Universum.elements.Contains(item)) && code == 1)
-        code = -1;
-
-    string[] its = active.get_string().Split(' ');
-    string it1 = its[0];
-    string? it2 = its.Length>1 ? its[1] : null;
-
-    bool fl1 = !Int32.TryParse(it1, out item1);
-    bool fl2 = !Int32.TryParse(it2, out item2);
-
-    if ((fl1 || fl2 || item1>=item2) && code == 4)
-        code=-1;
+    if (code == 1)
+    {
+        bool fl = Int32.TryParse(s1, out item);
+        if(!fl)
+        {
+            if (s1.Contains('.'))
+                s="Element must be a integer";
+            else if (!isThisInt(s1))
+                s="Element contains illegal symbol";
+            else
+                s="Elemnt out of range of integer type";
+        }
+    }
+    if(code == 4)
+    {
+        string[] items = s1.Split(' ');
+        if(items.Length<2)
+        {
+            s = "You must write two numbers for set bounds";
+        }
+        else
+        {
+            bool fl1 = Int32.TryParse(items[0], out item1);
+            bool fl2 = Int32.TryParse(items[1], out item2);
+            if(!fl1)
+            {
+                if(items[0].Contains('.'))
+                    s="Left bound must be a integer";
+                else if (!isThisInt(items[0]))
+                    s="Left bound contains illegal symbol";
+                else
+                    s="Left bound out of range of integer type";
+            }
+            else if(!fl2)
+            {
+                if (items[1].Contains('.'))
+                    s="Right bound must be a integer";
+                else if (!isThisInt(items[1]))
+                    s="Right bound contains illegal symbol";
+                else
+                    s="Right bound out of range of integer type";
+            }
+            else if(item1>=item2)
+            {
+                s="Left bound must be less then Right bound";
+            }
+        }
+    }
     return s;
+}
+bool isThisInt(string s)
+{
+    bool f = true;
+    string numbers = "0123456789";
+    for(int i=0;i<s.Length && f;++i)
+    {
+        if (!numbers.Contains(s[i]) ||(i==0 && s[i]=='0'))
+            f = false;
+    }
+    return f;
 }
