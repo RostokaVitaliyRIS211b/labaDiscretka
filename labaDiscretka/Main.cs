@@ -23,11 +23,11 @@ active.set_color_text(Color.Black);
 active.set_Fill_color_rect(Color.White);
 active.set_outline_color_rect(Color.Black);
 active.set_outline_thickness_rect(1);
-active.set_size_rect(150, 50);
+active.set_size_rect(450, 50);
 active.set_size_character_text(16);
-active.set_pos(565, 335);
+active.set_pos(640, 360);
 Textbox active2 = new(in active);
-active2.set_pos(565, 285);
+active2.set_pos(640, 310);
 bool isSpisokDraw = false;
 
 bool isActiveDraw = false;  
@@ -87,7 +87,8 @@ while(MainWindow.IsOpen)
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
-{   
+{
+    active.set_string("");
     if(isSpisokDraw && e.Button == Mouse.Button.Left)
     {
         int n = 0;
@@ -252,10 +253,19 @@ void KeyPressed(object? sender, KeyEventArgs? e)
         MainWindow.Close();
         return;
     }
+    if(e.Code == Keyboard.Key.Backspace)
+    {
+        active.set_string(active.get_string().Remove(active.get_string().Length-1));
+        return;
+    }
     if(e.Code!=Keyboard.Key.Enter && isActiveDraw)
     {
-        active.set_string(active.get_string()+e.Code);
+        char ee = WhatCharItIs(e.Code);
+        if(ee!='+')
+            active.set_string(active.get_string()+ee);
+        return;
     }
+  
     if(e.Code == Keyboard.Key.Enter && isActiveDraw)
     {
         int index = mutable is not null ? circles.IndexOf(mutable) : -1;
@@ -408,4 +418,18 @@ bool isThisInt(string s)
             f = false;
     }
     return f;
+}
+char WhatCharItIs(Keyboard.Key code)
+{
+    char ch='0';
+    string gay = "abcdefghijklmnopqrstuvwxyz0123456789";
+    if ((int)code<36)
+    {
+        ch = gay[(int)code];
+    }
+    else if ((int)code==57)
+        ch= ' ';
+    else
+        ch='+';
+    return ch;
 }
