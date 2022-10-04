@@ -3,7 +3,7 @@ namespace Sets
 {
     public static class Universum
     {
-        static public string name { get; set; }
+        static public string name { get; set; } = "Universum";
         static public List<int> elements = new();
     }
     public class Set
@@ -23,6 +23,15 @@ namespace Sets
 
             foreach (int x1 in x)
                 elements.Add(x1);
+        }
+        public Set(string name,int LowerBounder,int HigherBounder)
+        {
+            Name=name;
+            elements = new(HigherBounder-LowerBounder);
+            for(int i=LowerBounder;i<HigherBounder;++i)
+            {
+                elements.Add(i);
+            }
         }
         public void Add(int elem)
         {
@@ -97,9 +106,35 @@ namespace Sets
             }
             return new Set("!"+Name, elements2.ToArray());
         }
+        public void RemoveElem(int item)
+        {
+            elements.Remove(item);
+        }
+        public void Clear()
+        {
+            elements.Clear();
+        }
+        public override string? ToString()
+        {
+            string s = "{ ";
+            foreach (int x in elements)
+            {
+                s+=x+" ";
+            }
+            s+="}";
+            return s;
+        }
         public bool Contains(int item)
         {
             return elements.Contains(item);
+        }
+        public void AccordingToU()
+        {
+            foreach(int item in elements)
+            {
+                if (!Universum.elements.Contains(item))
+                    elements.Remove(item);
+            }
         }
     }
 }

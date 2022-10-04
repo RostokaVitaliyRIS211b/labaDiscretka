@@ -120,6 +120,10 @@
         {
             return rect.GetGlobalBounds().Contains(pos.X, pos.Y);
         }
+        public Text GetText()
+        {
+            return text;
+        }
         public void Draw(RenderTarget target, RenderStates states)
         {
             target.Draw(rect, states);
@@ -237,6 +241,10 @@
         public bool Contains(Vector2i vector2I)
         {
             return circle.GetGlobalBounds().Contains(vector2I.X, vector2I.Y);
+        }
+        public Text GetText()
+        {
+            return text;
         }
         public void Draw(RenderTarget target, RenderStates states)
         {

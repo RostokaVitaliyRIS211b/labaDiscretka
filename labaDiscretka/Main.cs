@@ -1,5 +1,6 @@
 ﻿using Sets;
 using System.Text;
+using System.Xml.Linq;
 using Textboxes;
 
 StringBuilder text = new();
@@ -15,21 +16,26 @@ InitTextboxes();
 
 CircleTextbox? mutable = null;
 CircleTextbox? catching = null;
-
+Clock clock = new();
 Textbox universum = new();
-
 Textbox active = new();
 active.set_color_text(Color.Black);
 active.set_Fill_color_rect(Color.White);
 active.set_outline_color_rect(Color.Black);
 active.set_outline_thickness_rect(1);
-active.set_size_rect(450, 50);
+active.set_size_rect(500, 50);
 active.set_size_character_text(16);
 active.set_pos(640, 360);
+
 Textbox active2 = new(in active);
 active2.set_pos(640, 310);
-bool isSpisokDraw = false;
+Textbox exception = new();
+exception.Copy(active);
+exception.set_size_rect(550, 120);
+exception.set_size_character_text(24);
 
+bool isSpisokDraw = false;
+bool isExceptionDraw = false;
 bool isActiveDraw = false;  
 
 buttons.Add(new Sprite
@@ -52,18 +58,29 @@ universum.set_pos(640, 360);
 universum.set_Fill_color_rect(new Color(181,230,29));
 universum.set_color_text(Color.Black);
 
+MainWindow.SetFramerateLimit(60);
 
 while(MainWindow.IsOpen)
 {
     MainWindow.Clear(Color.White);
-    MainWindow.DispatchEvents();
     MainWindow.Draw(universum);
+
+    try
+    {
+        MainWindow.DispatchEvents();
+    }
+    catch(Exception e)
+    {
+        isExceptionDraw = true;
+        exception.set_string(e.Message);
+    }
 
     foreach (Sprite sprite in buttons)
         MainWindow.Draw(sprite);
 
     foreach (CircleTextbox circle in circles)
         MainWindow.Draw(circle);
+
     if(catching is not null)
         MainWindow.Draw(catching);
 
@@ -81,22 +98,36 @@ while(MainWindow.IsOpen)
     }
     if(isActiveDraw)
     {
+        Vector2f t = new(active.GetText().GetGlobalBounds().Left+active.GetText().GetGlobalBounds().Width+1, 352);
+        Vector2f d = new(active.GetText().GetGlobalBounds().Left+active.GetText().GetGlobalBounds().Width+1, 367.8f);
         MainWindow.Draw(active);
         MainWindow.Draw(active2);
+        if (clock.ElapsedTime.AsSeconds()>1 && clock.ElapsedTime.AsSeconds()<2)
+        {
+            MainWindow.Draw(new Vertex[] { new Vertex(t, Color.Black), new Vertex(d, Color.Black) }, PrimitiveType.Lines, RenderStates.Default);
+        }
+        else if(clock.ElapsedTime.AsSeconds()>2)
+            clock.Restart();
+            
+    }
+    if(isExceptionDraw)
+    {
+        MainWindow.Draw(exception);
     }
     MainWindow.Display();//255 201 14
 }
 void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
 {
+    isExceptionDraw = false;
     active.set_string("");
     if(isSpisokDraw && e.Button == Mouse.Button.Left)
     {
         int n = 0;
         bool cliked = false;
-
-        foreach(Textbox textbox in textboxes)
+        clock.Restart();
+        foreach (Textbox textbox in textboxes)
         {
-            ++n;
+            n++;
             if(textbox.contains(e.X,e.Y))
             {
                 cliked = true;
@@ -160,7 +191,35 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                         active2.set_string("Введите имя множества " + Universum.name);
                     }
                     break;
+                case 6:
+                    if(mutable is not null)
+                    {
+                        active2.set_string("Все элементы множества "+set.Name);
+                        active.set_string(set.ToString() ?? "GAY");
+                    }
+                    else
+                    {
+                        string s = "{ ";
+                        foreach (int x in Universum.elements)
+                        {
+                            s+=x+" ";
+                        }
+                        s+="}";
+                        active2.set_string("Все элементы множества "+Universum.name);
+                        active.set_string(s ?? "GAY");
+                    }
+                     break;
+                default:
+                    isActiveDraw = false;
+                    mutable = null;
+                    break;
+
             }
+        }
+        else
+        {
+            isActiveDraw = false;
+            mutable = null;
         }
 
         isSpisokDraw = false;
@@ -248,6 +307,7 @@ void MouseButtonReleased(object? sender, MouseButtonEventArgs? e)
 }
 void KeyPressed(object? sender, KeyEventArgs? e)
 {
+    isExceptionDraw = false;
     if(e.Code==Keyboard.Key.Escape)
     {
         MainWindow.Close();
@@ -268,9 +328,10 @@ void KeyPressed(object? sender, KeyEventArgs? e)
   
     if(e.Code == Keyboard.Key.Enter && isActiveDraw)
     {
+        isActiveDraw = false;
         int index = mutable is not null ? circles.IndexOf(mutable) : -1;
         Set set = index!=-1 ? sets[index] : new();
-        string message = IsItException(active.get_string(), code);
+        string message = IsItException(active.get_string(), code,mutable is null);
 
         if (message!="NO")
             code=-1;
@@ -290,15 +351,14 @@ void KeyPressed(object? sender, KeyEventArgs? e)
                 break;
 
             case 5:
-                Rename(set, mutable is null);
+                Rename(set,active.get_string(),mutable is null);
                 break;
 
             default:
                 throw new Exception(message);
-
-
         }
         isActiveDraw = false;
+        mutable = null;
     }
 }
 void InitTextboxes()
@@ -310,7 +370,7 @@ void InitTextboxes()
     textbox.set_outline_color_rect(Color.Black);
     textbox.set_outline_thickness_rect(1);
     textbox.set_size_character_text(12);
-    textbox.set_size_rect(80, 20);
+    textbox.set_size_rect(90, 20);
     textbox.set_pos(40, 10);
     textboxes.Add(textbox);
     textbox = new();
@@ -333,28 +393,104 @@ void InitTextboxes()
     textbox.set_string("Rename");
     textbox.set_pos(40, 90);
     textboxes.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string("Show Elements");
+    textbox.set_pos(40, 110);
+    textboxes.Add(textbox);
 }
 void AddElem(Set set,string item,bool un = false)
 {
-   
+    int item1;
+    if (!Int32.TryParse(item, out item1))
+        throw new Exception("Exception in Addelem with element");
+    if (!un)
+    {
+        set.Add(item1);
+    }
+    else
+    {
+        if(!Universum.elements.Contains(item1))
+            Universum.elements.Add(item1);
+    }
 }
 void RemoveElem(Set set, string item, bool un = false)
 {
-    
+    if (!un)
+    {
+        int item1;
+        if (Int32.TryParse(item, out item1))
+            set.RemoveElem(item1);
+    }
+    else
+    {
+        int item1;
+        if (Int32.TryParse(item, out item1))
+            Universum.elements.Remove(item1);
+    }
 }
 void RemoveAll(Set set, bool un = false)
 {
-    
+    if (!un)
+    {
+        set.Name = "Empty set";
+        set.Clear();
+    }
+    else
+    {
+        Universum.elements.Clear();
+        circles.Clear();
+        sets.Clear();
+    }
 }
 void SetBounds(Set set, string item, bool un = false)
 {
-    
+    string[] items = item.Split(' ');
+    int item1, item2;
+
+    if (items.Length<1)
+        throw new Exception("Exception in SetBounds with count of elements");
+
+    bool fl1 = Int32.TryParse(items[0], out item1);
+    bool fl2 = Int32.TryParse(items[1], out item2);
+
+    if(!fl1 || !fl2)
+        throw new Exception("Exception in SetBounds with one of element");
+
+    if (item1>=item2)
+        throw new Exception("Lower >= Higher");
+
+    if (!un)
+    {
+        set = new Set(set.Name, item1, item2);
+    }
+    else
+    {
+        Universum.elements = new(item2-item1);
+        for (int i = item1; i<item2; ++i)
+        {
+            Universum.elements.Add(i);
+        }
+        foreach (Set set1 in sets)
+        {
+            set1.AccordingToU();
+        }
+    }
 }
-void Rename( Set set, bool un = false)
+void Rename( Set set,string name, bool un = false)
 {
-    
+    if(!un)
+    {
+        set.Name=name;
+        circles[sets.IndexOf(set)].SetString(name);
+    }
+    else
+    {
+        Universum.name=name;
+        universum.set_string(name);
+    }
 }
-string IsItException(string s1,int code)
+string IsItException(string s1,int code,bool un = false)
 {
     string s = "NO";
     int item, item1, item2;
@@ -368,8 +504,10 @@ string IsItException(string s1,int code)
             else if (!isThisInt(s1))
                 s="Element contains illegal symbol";
             else
-                s="Elemnt out of range of integer type";
+                s="Element out of range type integer";
         }
+        if (!un && !Universum.elements.Contains(item))
+            s="Element does not exists in Universum";
     }
     if(code == 4)
     {
@@ -391,6 +529,10 @@ string IsItException(string s1,int code)
                 else
                     s="Left bound out of range of integer type";
             }
+            else if(!un && !Universum.elements.Contains(item1))
+            {
+                s="Left bound does not exists in Universum";
+            }
             else if(!fl2)
             {
                 if (items[1].Contains('.'))
@@ -399,6 +541,10 @@ string IsItException(string s1,int code)
                     s="Right bound contains illegal symbol";
                 else
                     s="Right bound out of range of integer type";
+            }
+            else if (!un && !Universum.elements.Contains(item1))
+            {
+                s="Right bound does not exists in Universum";
             }
             else if(item1>=item2)
             {
@@ -423,9 +569,10 @@ char WhatCharItIs(Keyboard.Key code)
 {
     char ch='0';
     string gay = "abcdefghijklmnopqrstuvwxyz0123456789";
+    
     if ((int)code<36)
     {
-        ch = gay[(int)code];
+        ch = Keyboard.IsKeyPressed(Keyboard.Key.LShift)&&(int)(code)<25 ? (char)((int)gay[(int)code]-32): gay[(int)code];
     }
     else if ((int)code==57)
         ch= ' ';
