@@ -462,7 +462,7 @@ void SetBounds(Set set, string item, bool un = false)
 
     if (!un)
     {
-        set = new Set(set.Name, item1, item2);
+        set.SetBounds(item1, item2);
     }
     else
     {

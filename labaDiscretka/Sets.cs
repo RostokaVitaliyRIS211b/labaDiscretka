@@ -128,6 +128,14 @@ namespace Sets
         {
             return elements.Contains(item);
         }
+        public void SetBounds(int l,int b )
+        {
+            elements = new(b-l);
+            for (int i = l; i<b; ++i)
+            {
+                elements.Add(i);
+            }
+        }
         public void AccordingToU()
         {
             foreach(int item in elements)
