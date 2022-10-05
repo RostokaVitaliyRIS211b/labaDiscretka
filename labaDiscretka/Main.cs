@@ -11,14 +11,19 @@ List<CircleTextbox> circles = new();
 List<Set> sets = new();
 List<Sprite> buttons = new();
 List<Textbox> textboxes = new();
+List<Textbox> operations = new();
 
 InitTextboxes();
 
 CircleTextbox? mutable = null;
 CircleTextbox? catching = null;
+
+int[] operIndexes = new int[2]; 
+
 Clock clock = new();
 Textbox universum = new();
 Textbox active = new();
+
 active.set_color_text(Color.Black);
 active.set_Fill_color_rect(Color.White);
 active.set_outline_color_rect(Color.Black);
@@ -36,7 +41,8 @@ exception.set_size_character_text(24);
 
 bool isSpisokDraw = false;
 bool isExceptionDraw = false;
-bool isActiveDraw = false;  
+bool isActiveDraw = false;
+bool isOperationsDraw = false;
 
 buttons.Add(new Sprite
 {
@@ -108,7 +114,18 @@ while(MainWindow.IsOpen)
         }
         else if(clock.ElapsedTime.AsSeconds()>2)
             clock.Restart();
-            
+    }
+    if(isOperationsDraw)
+    {
+        for (int i = 0; i<operations.Count; ++i)
+        {
+            if (i>0)
+            {
+                Vector2f rty = operations[i - 1].get_position();
+                operations[i].set_pos(new Vector2f(rty.X, rty.Y + 20));
+            }
+            MainWindow.Draw(operations[i]);
+        }
     }
     if(isExceptionDraw)
     {
@@ -150,21 +167,21 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                 case 1:
                     if (mutable is not null)
                     {
-                        active2.set_string("Введите целое число для добавления в множество " + set.Name);
+                        active2.set_string("Write integer number for add it to set " + set.Name);
                     }
                     else
                     {
-                        active2.set_string("Введите целое число для добавления в множество " + Universum.name);
+                        active2.set_string("Write integer number for add it to set " + Universum.name);
                     }
                     break;
                 case 2:
                     if (mutable is not null)
                     {
-                        active2.set_string("Введите целое число для удаления из в множества " + set.Name);
+                        active2.set_string("Write integer number for delete it from set " + set.Name);
                     }
                     else
                     {
-                        active2.set_string("Введите целое число для удаления из в множества " + Universum.name);
+                        active2.set_string("Write integer number for delete it from set " + Universum.name);
                     }
                     break;
                 case 3:
@@ -174,27 +191,27 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                 case 4:
                     if (mutable is not null)
                     {
-                        active2.set_string("Введите два целых числа для задания множества " + set.Name);
+                        active2.set_string("Write two integer number to set bounds " + set.Name);
                     }
                     else
                     {
-                        active2.set_string("Введите два целых числа для задания множества " + Universum.name);
+                        active2.set_string("Write two integer number to set bounds " + Universum.name);
                     }
                     break;
                 case 5:
                     if (mutable is not null)
                     {
-                        active2.set_string("Введите имя множества " + set.Name);
+                        active2.set_string("Write name of set " + set.Name);
                     }
                     else
                     {
-                        active2.set_string("Введите имя множества " + Universum.name);
+                        active2.set_string(new string("Write name of set ") + Universum.name);
                     }
                     break;
                 case 6:
                     if(mutable is not null)
                     {
-                        active2.set_string("Все элементы множества "+set.Name);
+                        active2.set_string("All elements of set "+set.Name);
                         active.set_string(set.ToString() ?? "GAY");
                     }
                     else
@@ -205,10 +222,35 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                             s+=x+" ";
                         }
                         s+="}";
-                        active2.set_string("Все элементы множества "+Universum.name);
+                        active2.set_string("All elements of set "+Universum.name);
                         active.set_string(s ?? "GAY");
                     }
-                     break;
+                    break;
+                case 7:
+                    Set set1 = set.Addition();
+                    CircleTextbox circle = new();
+                    circle.SetRadius(40);
+                    circle.SetPosition(640, 320);
+                    circle.SetCharacterSize(12);
+                    circle.SetFillColorCircle(new Color(255, 201, 14));
+                    circle.SetFillColorText(Color.Black);
+                    circle.SetOutlineColorCircle(Color.Black);
+                    circle.SetOutlineThicknessCircle(2);
+                    if(mutable is not null)
+                    {
+                        set1.Name="!"+mutable.GetString();
+                        circle.SetString(set.Name);
+                    }
+                    else
+                    {
+                        set1 = new();
+                        circle.SetString("Empty set");
+                    }
+                    circles.Add(circle);
+                    sets.Add(set1);
+                    mutable = null;
+                    isActiveDraw = false;
+                    break;
                 default:
                     isActiveDraw = false;
                     mutable = null;
@@ -226,7 +268,63 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
 
         return;
     }
-
+    if(isOperationsDraw && e.Button == Mouse.Button.Left)
+    {
+        int n = 0;
+        bool cliked = false;
+        clock.Restart();
+        foreach (Textbox textbox in operations)
+        {
+            n++;
+            if (textbox.contains(e.X, e.Y))
+            {
+                cliked = true;
+                break;
+            }
+        }
+        if(cliked)
+        {
+            Set set = new();
+            CircleTextbox circle = new();
+            circle.SetRadius(40);
+            circle.SetPosition(640, 320);
+            circle.SetCharacterSize(12);
+            circle.SetFillColorCircle(new Color(255, 201, 14));
+            circle.SetFillColorText(Color.Black);
+            circle.SetOutlineColorCircle(Color.Black);
+            circle.SetOutlineThicknessCircle(2);
+            switch (n)
+            {
+                case 1:
+                    set = Set.Unification(sets[operIndexes[0]], sets[operIndexes[1]]);
+                    set.Name = sets[operIndexes[0]].Name+" || "+sets[operIndexes[1]].Name;
+                    circle.SetString(set.Name);
+                    break;
+                case 2:
+                    set = Set.Crossing(sets[operIndexes[0]], sets[operIndexes[1]]);
+                    set.Name = sets[operIndexes[0]].Name+" && "+sets[operIndexes[1]].Name;
+                    circle.SetString(set.Name);
+                    break;
+                case 3:
+                    set = Set.Difference(sets[operIndexes[0]], sets[operIndexes[1]]);
+                    set.Name = sets[operIndexes[0]].Name+" / "+sets[operIndexes[1]].Name;
+                    circle.SetString(set.Name);
+                    break;
+                case 4:
+                    set = Set.SymmDifference(sets[operIndexes[0]], sets[operIndexes[1]]);
+                    set.Name = sets[operIndexes[0]].Name+" △ "+sets[operIndexes[1]].Name;
+                    circle.SetString(set.Name);
+                    break;
+            }
+            
+            circles.Add(circle);
+            sets.Add(set);
+        }
+        catching = null;
+        isOperationsDraw = false;
+       
+    }
+    isOperationsDraw = false;
     isActiveDraw = false;
     isSpisokDraw = false;
     mutable = null;
@@ -300,9 +398,38 @@ void MouseMoved(object? sender, MouseMoveEventArgs? e)
             }
         }
     }
+    if (catching is null && isOperationsDraw)
+    {
+        foreach (Textbox textbox in operations)
+        {
+            if (textbox.contains(e.X, e.Y))
+            {
+                textbox.set_Fill_color_rect(new Color(157, 250, 234));
+            }
+            else
+            {
+                textbox.set_Fill_color_rect(Color.White);
+            }
+        }
+    }
 }
 void MouseButtonReleased(object? sender, MouseButtonEventArgs? e)
 {
+    if(catching is not null)
+    {
+        foreach (CircleTextbox circle in circles)
+        {
+            if (Dlina(catching.GetPosition(), circle.GetPosition())<=catching.GetRadius()+circle.GetRadius() && catching!=circle)
+            {
+                operIndexes[0]=circles.IndexOf(catching);
+                operIndexes[1]=circles.IndexOf(circle);
+                isOperationsDraw = true;
+                operations[0].set_pos(e.X, e.Y);
+                break;
+            }
+        }
+    }
+   
     catching = null;
 }
 void KeyPressed(object? sender, KeyEventArgs? e)
@@ -398,6 +525,31 @@ void InitTextboxes()
     textbox.set_string("Show Elements");
     textbox.set_pos(40, 110);
     textboxes.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string(" ! ");
+    textbox.set_pos(40, 130);
+    textboxes.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string(" || ");
+    textbox.set_pos(40, 10);
+    operations.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string(" && ");
+    textbox.set_pos(40, 10);
+    operations.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string(" / ");
+    textbox.set_pos(40, 10);
+    operations.Add(textbox);
+    textbox = new();
+    textbox.Copy(textboxes[0]);
+    textbox.set_string(" △ ");
+    textbox.set_pos(40, 10);
+    operations.Add(textbox);
 }
 void AddElem(Set set,string item,bool un = false)
 {
@@ -576,7 +728,13 @@ char WhatCharItIs(Keyboard.Key code)
     }
     else if ((int)code==57)
         ch= ' ';
+    else if((int)code==56 || (int)code==68)
+        ch='-';
     else
         ch='+';
     return ch;
+}
+double Dlina(Vector2f pos1,Vector2f pos2)
+{
+    return Math.Sqrt(Math.Pow(pos1.X-pos2.X,2)+Math.Pow(pos1.Y-pos2.Y, 2));
 }

@@ -10,11 +10,11 @@
             rect = new RectangleShape();
             text = new Text();
             text.OutlineThickness = 0;
-            font = new Font(Directory.GetCurrentDirectory()+"/ofont.ru_Impact.ttf"); text.Font = font; 
+            font = new Font(Directory.GetCurrentDirectory()+"/FallingSky-JKwK.otf"); text.Font = font; 
         }
         public Textbox(RectangleShape rect, Text text, Font font)
         {
-            font = new Font(Directory.GetCurrentDirectory()+"/ofont.ru_Impact.ttf"); text.Font = font;
+            font = new Font(Directory.GetCurrentDirectory()+"/FallingSky-JKwK.otf"); text.Font = font;
             this.rect = rect;
             this.text = text;
             this.font = font;
@@ -23,7 +23,7 @@
         {
             rect = new RectangleShape();
             text = new Text();
-            font = new Font(Directory.GetCurrentDirectory()+"/ofont.ru_Impact.ttf"); text.Font = font;
+            font = new Font(Directory.GetCurrentDirectory()+"/FallingSky-JKwK.otf"); text.Font = font;
             set_size_character_text((int)textbox.text.CharacterSize);
             set_string(textbox.text.DisplayedString);
             set_color_text(textbox.text.FillColor);
@@ -138,7 +138,7 @@
         public CircleTextbox()
         {
             circle = new();
-            font = new(Directory.GetCurrentDirectory()+"/ofont.ru_Impact.ttf");
+            font = new(Directory.GetCurrentDirectory()+"/FallingSky-JKwK.otf");
             text = new(String.Empty,font);
         }
         public CircleTextbox(CircleShape circle, Text text, Font font)
@@ -150,7 +150,7 @@
         public CircleTextbox(in CircleTextbox circleTextbox)
         {
             circle = new();
-            font = new(Directory.GetCurrentDirectory()+"/ofont.ru_Impact.ttf");
+            font = new(Directory.GetCurrentDirectory()+"/FallingSky-JKwK.otf");
             text = new(String.Empty, font);
 
         }
@@ -206,9 +206,9 @@
             x = circle.Position.X;
             y = circle.Position.Y;
         }
-        public float[] GetPosition()
+        public Vector2f GetPosition()
         {
-            return new float[] {circle.Position.X,circle.Position.Y};
+            return circle.Position;
         }
         public void GetPosition(out Vector2f vector2F)
         {

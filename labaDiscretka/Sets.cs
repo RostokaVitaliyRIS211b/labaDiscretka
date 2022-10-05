@@ -46,7 +46,7 @@ namespace Sets
             else
                 throw new Exception("Element already in the set");
         }
-        public Set Crossing(Set A,Set B)
+        static public Set Crossing(Set A,Set B)
         {
             List<int> elements2 = new();
             foreach(int x in A.elements)
@@ -54,9 +54,10 @@ namespace Sets
                 if(B.Contains(x))
                     elements2.Add(x);
             }
+            elements2.Sort();
             return new Set(A.Name+" & "+B.Name,elements2.ToArray());
         }
-        public Set Unification(Set A, Set B)
+        static public Set Unification(Set A, Set B)
         {
             List<int> elements2 = new(A.elements.Count);
             foreach(int x in A.elements)
@@ -69,9 +70,10 @@ namespace Sets
                 if (!elements2.Contains(x))
                     elements2.Add(x);
             }
+            elements2.Sort();
             return new Set(A.Name+" | "+B.Name,elements2.ToArray());
         }
-        public Set Difference(Set A, Set B)
+        static public Set Difference(Set A, Set B)
         {
             List<int> elements2 = new();
             foreach (int x in A.elements)
@@ -79,9 +81,10 @@ namespace Sets
                 if (!elements2.Contains(x)  && !B.elements.Contains(x))
                     elements2.Add(x);
             }
+            elements2.Sort();
             return new Set(A.Name+" | "+B.Name, elements2.ToArray());
         }
-        public Set SymmDifference(Set A, Set B)
+        static public Set SymmDifference(Set A, Set B)
         {
             List<int> elements2 = new();
             foreach (int x in A.elements)
@@ -94,6 +97,7 @@ namespace Sets
                 if (!elements2.Contains(x)  && !A.elements.Contains(x))
                     elements2.Add(x);
             }
+            elements2.Sort();
             return new Set(A.Name+" | "+B.Name, elements2.ToArray());
         }
         public Set Addition()
@@ -144,5 +148,6 @@ namespace Sets
                     elements.Remove(item);
             }
         }
+
     }
 }
