@@ -353,6 +353,7 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
             if (circle.Contains(e.X, e.Y))
             {
                 catching = circle;
+                clock.Restart();
                 return;
             }
         }
@@ -415,7 +416,7 @@ void MouseMoved(object? sender, MouseMoveEventArgs? e)
 }
 void MouseButtonReleased(object? sender, MouseButtonEventArgs? e)
 {
-    if(catching is not null)
+    if(catching is not null && clock.ElapsedTime.AsMilliseconds()>500)
     {
         foreach (CircleTextbox circle in circles)
         {
