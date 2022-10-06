@@ -413,6 +413,20 @@ void MouseMoved(object? sender, MouseMoveEventArgs? e)
             }
         }
     }
+    if(catching is null)
+    {
+        foreach(CircleTextbox circle in circles)
+        {
+            if(circle.Contains(e.X,e.Y))
+            {
+                circle.SetFillColorCircle(Color.Magenta);
+            }
+            else
+            {
+                circle.SetFillColorCircle(new Color(255, 201, 14));
+            }
+        }
+    }
 }
 void MouseButtonReleased(object? sender, MouseButtonEventArgs? e)
 {
