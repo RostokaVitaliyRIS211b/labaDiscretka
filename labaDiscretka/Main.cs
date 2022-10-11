@@ -1,6 +1,5 @@
 ﻿using Sets;
 using System.Text;
-using System.Xml.Linq;
 using Textboxes;
 
 StringBuilder text = new();
@@ -255,7 +254,6 @@ void MouseButtonPressed(object? sender,MouseButtonEventArgs? e)
                     isActiveDraw = false;
                     mutable = null;
                     break;
-
             }
         }
         else
@@ -633,7 +631,7 @@ void SetBounds(Set set, string item, bool un = false)
     }
     else
     {
-        Universum.elements = new(item2-item1);
+        Universum.elements = new(item2-item1+1);
         for (int i = item1; i<item2; ++i)
         {
             Universum.elements.Add(i);

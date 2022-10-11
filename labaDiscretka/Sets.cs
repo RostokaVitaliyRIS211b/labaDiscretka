@@ -142,11 +142,7 @@ namespace Sets
         }
         public void AccordingToU()
         {
-            foreach(int item in elements)
-            {
-                if (!Universum.elements.Contains(item))
-                    elements.Remove(item);
-            }
+            elements = elements.FindAll(x=>Universum.elements.Contains(x));
         }
 
     }
